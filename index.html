@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alexis Villalba — ALE DEV</title>
+  <meta name="description" content="Portfolio de Alexis Villalba, desarrollador web fullstack especializado en React, Node.js y diseño moderno." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+  <style>
+    :root {
+      --bg:       #080d1a;
+      --surface:  #0d1525;
+      --card:     #121e34;
+      --card2:    #182540;
+      --accent:   #5ab4d8;
+      --accent2:  #3a8fb5;
+      --accent3:  #7ecdef;
+      --green:    #22c55e;
+      --text:     #f0f6ff;
+      --muted:    #8da4bf;
+      --border:   rgba(90,180,216,0.15);
+      --glow:     rgba(90,180,216,0.25);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── Custom Cursor ─────────────────────────────── */
+    #cursor {
+      width: 12px; height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.15s ease, background 0.2s;
+      transform: translate(-50%,-50%);
+    }
+    #cursor-ring {
+      width: 36px; height: 36px;
+      border: 1.5px solid var(--accent);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9998;
+      transition: transform 0.35s cubic-bezier(.25,.46,.45,.94);
+      transform: translate(-50%,-50%);
+      opacity: 0.6;
+    }
+    body:hover #cursor { opacity: 1; }
+
+    /* ── Scrollbar ─────────────────────────────────── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--accent2); border-radius: 4px; }
+
+    /* ── Canvas hero ───────────────────────────────── */
+    #hero-canvas {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+    }
+
+    /* ── NAV ───────────────────────────────────────── */
+    nav {
+      position: fixed; top: 16px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      display: flex; align-items: center; gap: 2rem;
+      padding: 0.75rem 2rem;
+      background: rgba(8,13,26,0.75);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 60px;
+      transition: all 0.3s;
+    }
+    .nav-logo {
+      font-family: 'Archivo', sans-serif;
+      font-weight: 700; font-size: 1.1rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+    .nav-links a {
+      color: var(--muted); font-size: 0.85rem; font-weight: 500;
+      text-decoration: none; letter-spacing: 0.05em;
+      transition: color 0.2s;
+      cursor: none;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-cta {
+      padding: 0.45rem 1.2rem;
+      background: var(--accent);
+      color: #080d1a !important;
+      border-radius: 30px;
+      font-weight: 600 !important;
+      font-size: 0.82rem !important;
+      transition: background 0.2s, transform 0.15s !important;
+    }
+    .nav-cta:hover { background: var(--accent3) !important; transform: scale(1.04); }
+
+    /* ── HERO ──────────────────────────────────────── */
+    #hero {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .hero-content {
+      position: relative; z-index: 2;
+      text-align: center;
+      padding: 0 1.5rem;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.35rem 1rem;
+      background: rgba(90,180,216,0.1);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      font-size: 0.78rem; color: var(--accent);
+      font-weight: 500; letter-spacing: 0.06em;
+      margin-bottom: 1.5rem;
+    }
+    .hero-badge span { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 1.8s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+
+    .hero-name {
+      font-family: 'Archivo', sans-serif;
+      font-size: clamp(3rem, 9vw, 7rem);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #fff 30%, var(--accent) 70%, var(--accent3) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+    .hero-role {
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      color: var(--muted);
+      font-weight: 400;
+      min-height: 2rem;
+      margin-bottom: 2rem;
+    }
+    #typed-text { color: var(--accent); font-weight: 600; }
+    .cursor-blink {
+      display: inline-block;
+      width: 2px; height: 1.2em;
+      background: var(--accent);
+      vertical-align: middle;
+      margin-left: 2px;
+      animation: blink 0.8s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    .hero-desc {
+      max-width: 540px; margin: 0 auto 2.5rem;
+      color: var(--muted); font-size: 1rem; line-height: 1.7;
+    }
+    .hero-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.85rem 2rem;
+      background: var(--accent);
+      color: #080d1a;
+      border-radius: 50px;
+      font-weight: 700; font-size: 0.9rem;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      cursor: none;
+    }
+    .btn-primary:hover {
+      background: var(--accent3);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(90,180,216,0.35);
+    }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.85rem 2rem;
+      background: transparent;
+      color: var(--accent);
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      font-weight: 600; font-size: 0.9rem;
+      text-decoration: none;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      cursor: none;
+    }
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      background: rgba(90,180,216,0.08);
+      transform: translateY(-2px);
+    }
+
+    .hero-scroll {
+      position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      color: var(--muted); font-size: 0.72rem; letter-spacing: 0.1em;
+      z-index: 2;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(-6px)} }
+    .scroll-line {
+      width: 1px; height: 40px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+    }
+
+    /* ── SECTIONS ──────────────────────────────────── */
+    section { padding: 6rem 1.5rem; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .section-tag {
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.18em; color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+    .section-title {
+      font-family: 'Archivo', sans-serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800; line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+    .section-sub {
+      color: var(--muted); max-width: 500px; line-height: 1.7;
+      font-size: 1rem; margin-bottom: 3.5rem;
+    }
+
+    /* ── ABOUT ─────────────────────────────────────── */
+    #about .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    .about-visual {
+      position: relative;
+    }
+    .about-3d-wrapper {
+      width: 100%; aspect-ratio: 1;
+      max-width: 380px;
+      margin: 0 auto;
+      position: relative;
+    }
+    #about-canvas {
+      width: 100%; height: 100%;
+      border-radius: 24px;
+    }
+    .about-card {
+      position: absolute; bottom: -1.5rem; right: -1.5rem;
+      background: rgba(18,30,52,0.95);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1rem 1.25rem;
+      backdrop-filter: blur(10px);
+      min-width: 160px;
+    }
+    .about-card .val {
+      font-family: 'Archivo', sans-serif;
+      font-size: 1.8rem; font-weight: 800;
+      color: var(--accent);
+    }
+    .about-card .lbl { font-size: 0.78rem; color: var(--muted); }
+
+    .about-text h3 {
+      font-family: 'Archivo', sans-serif;
+      font-size: 1.8rem; font-weight: 700;
+      margin-bottom: 1.25rem;
+      line-height: 1.2;
+    }
+    .about-text p { color: var(--muted); line-height: 1.75; margin-bottom: 1rem; font-size: 0.98rem; }
+    .about-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+    .tag {
+      padding: 0.35rem 0.85rem;
+      background: rgba(90,180,216,0.08);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 0.78rem; color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* ── SKILLS ────────────────────────────────────── */
+    #skills { background: var(--surface); }
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+    }
+    .skill-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.5rem;
+      display: flex; flex-direction: column; align-items: flex-start; gap: 1rem;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+      cursor: none;
+    }
+    .skill-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--accent);
+      box-shadow: 0 16px 40px rgba(90,180,216,0.15);
+    }
+    .skill-icon {
+      width: 48px; height: 48px;
+      background: rgba(90,180,216,0.1);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .skill-icon svg { width: 26px; height: 26px; }
+    .skill-name { font-weight: 600; font-size: 0.95rem; }
+    .skill-bar-wrap {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border-radius: 4px;
+      height: 4px;
+      overflow: hidden;
+    }
+    .skill-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent2), var(--accent3));
+      border-radius: 4px;
+      width: 0%;
+      transition: width 1.4s cubic-bezier(.25,.46,.45,.94);
+    }
+    .skill-pct { font-size: 0.78rem; color: var(--muted); margin-left: auto; }
+    .skill-meta { display: flex; width: 100%; align-items: center; }
+
+    /* ── SERVICES ──────────────────────────────────── */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    .service-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s, border-color 0.25s;
+      cursor: none;
+    }
+    .service-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 0% 0%, rgba(90,180,216,0.08), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .service-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+    .service-card:hover::before { opacity: 1; }
+    .service-num {
+      font-family: 'Archivo', sans-serif;
+      font-size: 3rem; font-weight: 900;
+      color: rgba(90,180,216,0.08);
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+    .service-icon-wrap {
+      width: 52px; height: 52px;
+      background: rgba(90,180,216,0.1);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.25rem;
+    }
+    .service-icon-wrap svg { width: 28px; height: 28px; color: var(--accent); }
+    .service-card h3 { font-weight: 700; font-size: 1.1rem; margin-bottom: 0.6rem; }
+    .service-card p { color: var(--muted); font-size: 0.88rem; line-height: 1.65; }
+
+    /* ── EDUCATION ─────────────────────────────────── */
+    #education { background: var(--surface); }
+    .edu-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    .edu-col h4 {
+      font-family: 'Archivo', sans-serif;
+      font-size: 1.1rem; font-weight: 700;
+      color: var(--accent); margin-bottom: 1.5rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .timeline { display: flex; flex-direction: column; gap: 1.25rem; }
+    .tl-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem 1.5rem;
+      position: relative;
+      transition: border-color 0.25s, transform 0.25s;
+    }
+    .tl-item:hover { border-color: var(--accent); transform: translateX(4px); }
+    .tl-year {
+      font-size: 0.72rem; color: var(--accent);
+      font-weight: 600; letter-spacing: 0.08em;
+      margin-bottom: 0.35rem;
+    }
+    .tl-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.25rem; }
+    .tl-sub { color: var(--muted); font-size: 0.82rem; }
+    .cert-badge {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      padding: 0.2rem 0.6rem;
+      background: rgba(34,197,94,0.1);
+      border: 1px solid rgba(34,197,94,0.2);
+      border-radius: 20px;
+      font-size: 0.7rem; color: var(--green);
+      font-weight: 600; margin-top: 0.5rem;
+    }
+
+    /* ── PROJECTS ──────────────────────────────────── */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+    .project-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+      cursor: none;
+    }
+    .project-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--accent);
+      box-shadow: 0 20px 50px rgba(90,180,216,0.12);
+    }
+    .project-thumb {
+      height: 180px;
+      background: linear-gradient(135deg, var(--card2) 0%, #1a2d4a 100%);
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .project-thumb::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at center, rgba(90,180,216,0.12), transparent 70%);
+    }
+    .project-thumb svg { width: 56px; height: 56px; color: rgba(90,180,216,0.3); }
+    .project-body { padding: 1.5rem; }
+    .project-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem; }
+    .project-tag {
+      padding: 0.2rem 0.6rem;
+      background: rgba(90,180,216,0.08);
+      border-radius: 20px;
+      font-size: 0.72rem; color: var(--accent); font-weight: 500;
+    }
+    .project-card h3 { font-weight: 700; font-size: 1rem; margin-bottom: 0.5rem; }
+    .project-card p { color: var(--muted); font-size: 0.85rem; line-height: 1.6; margin-bottom: 1rem; }
+    .project-links { display: flex; gap: 0.75rem; }
+    .proj-link {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      font-size: 0.8rem; font-weight: 600;
+      color: var(--accent); text-decoration: none;
+      transition: color 0.2s;
+      cursor: none;
+    }
+    .proj-link:hover { color: var(--accent3); }
+    .proj-link svg { width: 14px; height: 14px; }
+
+    /* ── TESTIMONIALS ──────────────────────────────── */
+    #testimonials { background: var(--surface); }
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 1.5rem;
+    }
+    .testi-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2rem;
+      transition: transform 0.25s, border-color 0.25s;
+    }
+    .testi-card:hover { transform: translateY(-4px); border-color: var(--accent); }
+    .testi-stars { display: flex; gap: 3px; margin-bottom: 1rem; }
+    .star { color: #f59e0b; font-size: 0.9rem; }
+    .testi-text {
+      color: var(--muted); font-size: 0.9rem; line-height: 1.7;
+      margin-bottom: 1.5rem; font-style: italic;
+    }
+    .testi-author { display: flex; align-items: center; gap: 0.75rem; }
+    .testi-avatar {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent3));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Archivo', sans-serif;
+      font-weight: 700; font-size: 0.95rem; color: #080d1a;
+    }
+    .testi-name { font-weight: 700; font-size: 0.9rem; }
+    .testi-loc { color: var(--muted); font-size: 0.76rem; }
+
+    /* ── CONTACT ───────────────────────────────────── */
+    #contact {
+      background: radial-gradient(ellipse at 50% 0%, rgba(90,180,216,0.08) 0%, transparent 60%);
+    }
+    .contact-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+    .contact-info { display: flex; flex-direction: column; gap: 1.5rem; }
+    .contact-link {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 1.25rem 1.5rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      text-decoration: none; color: var(--text);
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+      cursor: none;
+    }
+    .contact-link:hover {
+      border-color: var(--accent);
+      transform: translateX(4px);
+      box-shadow: 0 8px 24px rgba(90,180,216,0.12);
+    }
+    .contact-icon {
+      width: 46px; height: 46px; flex-shrink: 0;
+      background: rgba(90,180,216,0.1);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .contact-icon svg { width: 22px; height: 22px; color: var(--accent); }
+    .contact-label { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.15rem; }
+    .contact-val { font-weight: 600; font-size: 0.92rem; }
+
+    /* Form */
+    .contact-form { display: flex; flex-direction: column; gap: 1.25rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+    .form-group label { font-size: 0.82rem; font-weight: 600; color: var(--muted); }
+    .form-group input,
+    .form-group textarea {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.85rem 1.1rem;
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(90,180,216,0.12);
+    }
+    .form-group textarea { resize: vertical; min-height: 130px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .btn-send {
+      padding: 0.95rem 2rem;
+      background: var(--accent);
+      color: #080d1a;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    }
+    .btn-send:hover {
+      background: var(--accent3);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(90,180,216,0.3);
+    }
+
+    /* ── FOOTER ────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+    .footer-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-logo {
+      font-family: 'Archivo', sans-serif;
+      font-weight: 700; color: var(--accent);
+      font-size: 1rem; letter-spacing: 0.08em;
+    }
+    .footer-copy { font-size: 0.8rem; color: var(--muted); }
+    .footer-socials { display: flex; gap: 0.75rem; }
+    .social-btn {
+      width: 38px; height: 38px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted);
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s, transform 0.15s;
+      cursor: none;
+    }
+    .social-btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-3px); }
+    .social-btn svg { width: 16px; height: 16px; }
+
+    /* ── REVEAL ANIMATIONS ─────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    /* ── RESPONSIVE ────────────────────────────────── */
+    @media (max-width: 900px) {
+      #about .about-grid,
+      .contact-inner,
+      .edu-grid { grid-template-columns: 1fr; }
+      .about-visual { max-width: 320px; margin: 0 auto; }
+      nav { gap: 1rem; padding: 0.65rem 1.25rem; }
+      .nav-links { gap: 0.9rem; }
+    }
+    @media (max-width: 600px) {
+      nav { top: 10px; padding: 0.6rem 1rem; }
+      .nav-links li:not(:last-child) { display: none; }
+      .form-row { grid-template-columns: 1fr; }
+      section { padding: 4rem 1.25rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- ── NAV ───────────────────────────────────────────── -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">ALE DEV</a>
+  <ul class="nav-links">
+    <li><a href="#about">Sobre mí</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#services">Servicios</a></li>
+    <li><a href="#education">Formación</a></li>
+    <li><a href="#projects">Proyectos</a></li>
+    <li><a href="#contact" class="nav-cta">Contacto</a></li>
+  </ul>
+</nav>
+
+<!-- ── HERO ──────────────────────────────────────────── -->
+<section id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span></span> Disponible para proyectos
+    </div>
+    <h1 class="hero-name">Alexis Villalba</h1>
+    <p class="hero-role">
+      <span id="typed-text"></span><span class="cursor-blink"></span>
+    </p>
+    <p class="hero-desc">
+      Desarrollador web fullstack apasionado por crear experiencias digitales modernas,
+      rápidas y a medida. Especializado en React, Node.js y diseño UI/UX.
+    </p>
+    <div class="hero-btns">
+      <a href="#projects" class="btn-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Ver proyectos
+      </a>
+      <a href="#contact" class="btn-secondary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Hablemos
+      </a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    SCROLL
+  </div>
+</section>
+
+<!-- ── ABOUT ──────────────────────────────────────────── -->
+<section id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-visual reveal">
+        <div class="about-3d-wrapper">
+          <canvas id="about-canvas"></canvas>
+          <div class="about-card">
+            <div class="val">3+</div>
+            <div class="lbl">Años de experiencia</div>
+          </div>
+        </div>
+      </div>
+      <div class="about-text reveal">
+        <p class="section-tag">Sobre mí</p>
+        <h2 class="section-title">Creando el futuro<br/>con código.</h2>
+        <p>Soy Alexis Villalba, desarrollador web fullstack de Rafaela, Santa Fe. Actualmente cursando la Tecnicatura Universitaria en Programación en la UTN, con formación en desarrollo web, JavaScript, React y backend con Node.js.</p>
+        <p>Me apasiona transformar ideas en productos digitales modernos que impacten a las personas. Combino diseño, performance y buenas prácticas para entregar soluciones reales.</p>
+        <div class="about-tags">
+          <span class="tag">React JS</span>
+          <span class="tag">Node.js</span>
+          <span class="tag">JavaScript</span>
+          <span class="tag">HTML & CSS</span>
+          <span class="tag">Git & GitHub</span>
+          <span class="tag">Express</span>
+          <span class="tag">Bases de datos</span>
+          <span class="tag">UTN Rafaela</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SKILLS ─────────────────────────────────────────── -->
+<section id="skills">
+  <div class="container">
+    <p class="section-tag reveal">Habilidades técnicas</p>
+    <h2 class="section-title reveal">Mi stack tecnológico.</h2>
+    <p class="section-sub reveal">Herramientas y tecnologías que domino para construir productos web modernos de principio a fin.</p>
+
+    <div class="skills-grid">
+      <!-- HTML -->
+      <div class="skill-card reveal">
+        <div class="skill-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#5ab4d8">
+            <path d="M4 3l1.5 16.5L12 21l6.5-1.5L20 3H4z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 8h8l-.5 5.5-3.5 1-3.5-1L8.5 11H16" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="skill-name">HTML5</div>
+        <div class="skill-meta">
+          <div class="skill-bar-wrap" style="flex:1"><div class="skill-bar" data-pct="95"></div></div>
+          <span class="skill-pct" style="margin-left:0.75rem">95%</span>
+        </div>
+      </div>
+      <!-- CSS -->
+      <div class="skill-card reveal">
+        <div class="skill-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#5ab4d8" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 3l1.5 16.5L12 21l6.5-1.5L20 3H4z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16 8H8l.5 4H15l-.5 4.5-2.5.8-2.5-.8-.2-2H8l.3 3.5 3.7 1 3.7-1L16.5 8z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="skill-name">CSS3</div>
+        <div class="skill-meta">
+          <div class="skill-bar-wrap" style="flex:1"><div class="skill-bar" data-pct="90"></div></div>
+          <span class="skill-pct" style="margin-left:0.75rem">90%</span>
+        </div>
+      </div>
+      <!-- JS -->
+      <div class="skill-card reveal">
+        <div class="skill-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#5ab4d8" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="3" width="18" height="18" rx="2" stroke-width="1.5"/>
+            <path d="M8 17v-6M12 17c0 1.1.9 2 2 2s2-.9 2-2v-6" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="skill-name">JavaScript</div>
+        <div class="skill-meta">
+          <div class="skill-bar-wrap" style="flex:1"><div class="skill-bar" data-pct="88"></div></div>
+          <span class="skill-pct" style="margin-left:0.75rem">88%</span>
+        </div>
+      </div>
+      <!-- React -->
+      <div class="skill-card reveal">
+        <div class="skill-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#5ab4d8" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="2" stroke-width="1.5"/>
+            <ellipse cx="12" cy="12" rx="10" ry="4" stroke-width="1.5"/>
+            <ellipse cx="12" cy="12" rx="10" ry="4" stroke-width="1.5" transform="rotate(60 12 12)"/>
+            <ellipse cx="12" cy="12" rx="10" ry="4" stroke-width="1.5" transform="rotate(120 12 12)"/>
+          </svg>
+        </div>
+        <div class="skill-name">React JS</div>
+        <div class="skill-meta">
+          <div class="skill-bar-wrap" style="flex:1"><div class="skill-bar" data-pct="82"></div></div>
+          <span class="skill-pct" style="margin-left:0.75rem">82%</span>
+        </div>
+      </div>
+      <!-- Node.js -->
+      <div class="skill-card reveal">
+        <div class="skill-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#5ab4d8" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L3 7v5c0 5.5 3.8 10.7 9 12 5.2-1.3 9-6.5 9-12V7L12 2z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9 12l2 2 4-4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="skill-name">Node.js & Express</div>
+        <div class="skill-meta">
+          <div class="skill-bar-wrap" style="flex:1"><div class="skill-bar" data-pct="78"></div></div>
+          <span class="skill-pct" style="margin-left:0.75rem">78%</span>
+        </div>
+      </div>
+      <!-- Git -->
+      <div class="skill-card reveal">
+        <div class="skill-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#5ab4d8" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="18" cy="6" r="2" stroke-width="1.5"/>
+            <circle cx="6" cy="18" r="2" stroke-width="1.5"/>
+            <circle cx="6" cy="6" r="2" stroke-width="1.5"/>
+            <path d="M8 6h8M6 8v8M8 18h3" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M11 18h4a2 2 0 0 0 2-2V8" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="skill-name">Git & GitHub</div>
+        <div class="skill-meta">
+          <div class="skill-bar-wrap" style="flex:1"><div class="skill-bar" data-pct="85"></div></div>
+          <span class="skill-pct" style="margin-left:0.75rem">85%</span>
+        </div>
+      </div>
+      <!-- DB -->
+      <div class="skill-card reveal">
+        <div class="skill-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#5ab4d8" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="12" cy="5" rx="9" ry="3" stroke-width="1.5"/>
+            <path d="M3 5v4c0 1.7 4 3 9 3s9-1.3 9-3V5" stroke-width="1.5"/>
+            <path d="M3 9v5c0 1.7 4 3 9 3s9-1.3 9-3V9" stroke-width="1.5"/>
+            <path d="M3 14v5c0 1.7 4 3 9 3s9-1.3 9-3v-5" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="skill-name">Bases de datos</div>
+        <div class="skill-meta">
+          <div class="skill-bar-wrap" style="flex:1"><div class="skill-bar" data-pct="72"></div></div>
+          <span class="skill-pct" style="margin-left:0.75rem">72%</span>
+        </div>
+      </div>
+      <!-- Office -->
+      <div class="skill-card reveal">
+        <div class="skill-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#5ab4d8" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="3" width="8" height="8" rx="1.5" stroke-width="1.5"/>
+            <rect x="13" y="3" width="8" height="8" rx="1.5" stroke-width="1.5"/>
+            <rect x="3" y="13" width="8" height="8" rx="1.5" stroke-width="1.5"/>
+            <rect x="13" y="13" width="8" height="8" rx="1.5" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="skill-name">Microsoft Office</div>
+        <div class="skill-meta">
+          <div class="skill-bar-wrap" style="flex:1"><div class="skill-bar" data-pct="93"></div></div>
+          <span class="skill-pct" style="margin-left:0.75rem">93%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SERVICES ───────────────────────────────────────── -->
+<section id="services">
+  <div class="container">
+    <p class="section-tag reveal">Lo que ofrezco</p>
+    <h2 class="section-title reveal">Mis servicios.</h2>
+    <p class="section-sub reveal">Soluciones digitales completas para llevar tu negocio al siguiente nivel con tecnología moderna.</p>
+    <div class="services-grid">
+
+      <div class="service-card reveal">
+        <div class="service-num">01</div>
+        <div class="service-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+        </div>
+        <h3>Diseño de páginas web</h3>
+        <p>Creo diseños modernos, atractivos y totalmente adaptados a la identidad de tu marca y las necesidades de tu negocio.</p>
+      </div>
+
+      <div class="service-card reveal">
+        <div class="service-num">02</div>
+        <div class="service-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <h3>Desarrollo web</h3>
+        <p>Desarrollo sitios web funcionales, rápidos y escalables con las tecnologías más modernas del mercado.</p>
+      </div>
+
+      <div class="service-card reveal">
+        <div class="service-num">03</div>
+        <div class="service-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        </div>
+        <h3>Producción de maquetas</h3>
+        <p>Creo maquetas profesionales para planificar y validar tu sitio antes de pasar al desarrollo, ahorrando tiempo y costos.</p>
+      </div>
+
+      <div class="service-card reveal">
+        <div class="service-num">04</div>
+        <div class="service-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <h3>Configuración y optimización</h3>
+        <p>Optimización de velocidad, SEO técnico, seguridad y performance para que tu sitio destaque en los buscadores.</p>
+      </div>
+
+      <div class="service-card reveal">
+        <div class="service-num">05</div>
+        <div class="service-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        </div>
+        <h3>Catálogos digitales con QR</h3>
+        <p>Catálogos digitales modernos y accesibles desde un código QR personalizado para tu negocio o emprendimiento.</p>
+      </div>
+
+      <div class="service-card reveal">
+        <div class="service-num">06</div>
+        <div class="service-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3>Mantenimiento mensual</h3>
+        <p>Actualizaciones, optimización y soporte constante para que tu web siempre funcione perfectamente.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── EDUCATION ──────────────────────────────────────── -->
+<section id="education">
+  <div class="container">
+    <p class="section-tag reveal">Mi camino</p>
+    <h2 class="section-title reveal">Formación y certificaciones.</h2>
+    <p class="section-sub reveal">Aprendizaje constante para estar siempre a la vanguardia del desarrollo web.</p>
+
+    <div class="edu-grid">
+      <div class="edu-col">
+        <h4>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          Educación
+        </h4>
+        <div class="timeline">
+          <div class="tl-item reveal">
+            <div class="tl-year">2023 — Actualidad</div>
+            <div class="tl-title">Tecnicatura Universitaria en Programación</div>
+            <div class="tl-sub">UTN — Facultad Regional Rafaela · 2do año en curso</div>
+          </div>
+          <div class="tl-item reveal">
+            <div class="tl-year">2013 — 2019</div>
+            <div class="tl-title">Técnico en Producción Agropecuaria</div>
+            <div class="tl-sub">Instituto I.D.E.S.A. — Ataliva, Santa Fe</div>
+          </div>
+          <div class="tl-item reveal">
+            <div class="tl-year">2013 — 2018</div>
+            <div class="tl-title">Taller de Computación</div>
+            <div class="tl-sub">Instituto I.D.E.S.A. · Microsoft Office avanzado</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="edu-col">
+        <h4>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+          Certificaciones
+        </h4>
+        <div class="timeline">
+          <div class="tl-item reveal">
+            <div class="tl-year">Mar 2024 — Oct 2024</div>
+            <div class="tl-title">Programación Backend</div>
+            <div class="tl-sub">Coderhouse · Node.js, Express, Bases de datos</div>
+            <span class="cert-badge">
+              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Certificado
+            </span>
+          </div>
+          <div class="tl-item reveal">
+            <div class="tl-year">Nov 2023 — Ene 2024</div>
+            <div class="tl-title">React JS</div>
+            <div class="tl-sub">Coderhouse · Desarrollo Frontend con React</div>
+            <span class="cert-badge">
+              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Certificado
+            </span>
+          </div>
+          <div class="tl-item reveal">
+            <div class="tl-year">Dic 2022 — Feb 2023</div>
+            <div class="tl-title">JavaScript</div>
+            <div class="tl-sub">Coderhouse · Programación con JS</div>
+            <span class="cert-badge">
+              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Certificado
+            </span>
+          </div>
+          <div class="tl-item reveal">
+            <div class="tl-year">Oct 2022 — Dic 2022</div>
+            <div class="tl-title">Desarrollo Web</div>
+            <div class="tl-sub">Coderhouse · HTML, CSS y fundamentos web</div>
+            <span class="cert-badge">
+              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Certificado
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROJECTS ───────────────────────────────────────── -->
+<section id="projects">
+  <div class="container">
+    <p class="section-tag reveal">Portfolio</p>
+    <h2 class="section-title reveal">Proyectos destacados.</h2>
+    <p class="section-sub reveal">Una selección de los proyectos que desarrollé durante mi formación y práctica profesional.</p>
+
+    <div class="projects-grid">
+
+      <div class="project-card reveal">
+        <div class="project-thumb">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="project-body">
+          <div class="project-tags">
+            <span class="project-tag">Node.js</span>
+            <span class="project-tag">Express</span>
+            <span class="project-tag">MongoDB</span>
+          </div>
+          <h3>Programación Backend</h3>
+          <p>Proyecto de backend completo desarrollado con Node.js, Express y bases de datos. API REST con autenticación y gestión de datos.</p>
+          <div class="project-links">
+            <a href="https://github.com/Alexis-Villalba" target="_blank" rel="noopener" class="proj-link">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+              GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-thumb" style="background: linear-gradient(135deg, #0f2027 0%, #1a3a5c 100%);">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/></svg>
+        </div>
+        <div class="project-body">
+          <div class="project-tags">
+            <span class="project-tag">React JS</span>
+            <span class="project-tag">JavaScript</span>
+            <span class="project-tag">CSS</span>
+          </div>
+          <h3>Proyecto ReactJS</h3>
+          <p>Aplicación web desarrollada con React JS aplicando componentes, hooks, estado y routing. Proyecto certificado en Coderhouse.</p>
+          <div class="project-links">
+            <a href="https://github.com/Alexis-Villalba" target="_blank" rel="noopener" class="proj-link">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+              GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-thumb" style="background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 100%);">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+        <div class="project-body">
+          <div class="project-tags">
+            <span class="project-tag">HTML</span>
+            <span class="project-tag">CSS</span>
+            <span class="project-tag">JavaScript</span>
+          </div>
+          <h3>Rescatistas Independientes</h3>
+          <p>Sitio web para una organización de rescate animal. Proyecto de desarrollo web con diseño responsive y funcionalidades interactivas.</p>
+          <div class="project-links">
+            <a href="https://github.com/Alexis-Villalba" target="_blank" rel="noopener" class="proj-link">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+              GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-thumb" style="background: linear-gradient(135deg, #0a1a0f 0%, #1a3a28 100%);">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div class="project-body">
+          <div class="project-tags">
+            <span class="project-tag">HTML</span>
+            <span class="project-tag">CSS</span>
+            <span class="project-tag">JS</span>
+          </div>
+          <h3>Sitio Web JS</h3>
+          <p>Proyecto de sitio web con JavaScript vanilla. Interactividad, DOM manipulation y lógica de programación aplicada.</p>
+          <div class="project-links">
+            <a href="https://github.com/Alexis-Villalba" target="_blank" rel="noopener" class="proj-link">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+              GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── TESTIMONIALS ───────────────────────────────────── -->
+<section id="testimonials">
+  <div class="container">
+    <p class="section-tag reveal">Lo que dicen</p>
+    <h2 class="section-title reveal">Clientes satisfechos.</h2>
+    <p class="section-sub reveal">Experiencias reales de personas y empresas que confiaron en mi trabajo.</p>
+
+    <div class="testi-grid">
+      <div class="testi-card reveal">
+        <div class="testi-stars">
+          <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+        </div>
+        <p class="testi-text">"Un profesional de primer nivel. Ale entendió perfectamente la identidad que queríamos para nuestra marca y logró una web que no solo es estéticamente impecable, sino también súper rápida. Totalmente recomendado."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">FT</div>
+          <div>
+            <div class="testi-name">Facundo Torres</div>
+            <div class="testi-loc">Buenos Aires</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card reveal">
+        <div class="testi-stars">
+          <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+        </div>
+        <p class="testi-text">"Excelente experiencia de punta a punta. Se nota la dedicación en cada detalle. Logró traducir nuestras ideas en un sitio funcional y moderno que nos ayudó a traccionar muchísimos más clientes."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">MB</div>
+          <div>
+            <div class="testi-name">Matias Benítez</div>
+            <div class="testi-loc">Córdoba Capital</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card reveal">
+        <div class="testi-stars">
+          <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+        </div>
+        <p class="testi-text">"Buscábamos algo totalmente personalizado y no una plantilla genérica. El proceso fue muy fluido y el resultado final superó nuestras expectativas. Es un socio clave para cualquier proyecto digital."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">MR</div>
+          <div>
+            <div class="testi-name">Martina Rossi</div>
+            <div class="testi-loc">Rosario, Santa Fe</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CONTACT ────────────────────────────────────────── -->
+<section id="contact">
+  <div class="container">
+    <p class="section-tag reveal">Contacto</p>
+    <h2 class="section-title reveal">¿Tenés un proyecto?<br/>Hablemos.</h2>
+    <p class="section-sub reveal">Estoy disponible para proyectos freelance, colaboraciones y oportunidades laborales. No dudes en escribirme.</p>
+
+    <div class="contact-inner">
+      <div class="contact-info">
+        <a href="https://wa.me/543493663141" target="_blank" rel="noopener" class="contact-link reveal">
+          <div class="contact-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          </div>
+          <div>
+            <div class="contact-label">WhatsApp</div>
+            <div class="contact-val">+54 3493 663141</div>
+          </div>
+        </a>
+
+        <a href="mailto:alevillalba3493@gmail.com" class="contact-link reveal">
+          <div class="contact-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div>
+            <div class="contact-label">Email</div>
+            <div class="contact-val">alevillalba3493@gmail.com</div>
+          </div>
+        </a>
+
+        <a href="https://www.instagram.com/aledev.web" target="_blank" rel="noopener" class="contact-link reveal">
+          <div class="contact-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </div>
+          <div>
+            <div class="contact-label">Instagram</div>
+            <div class="contact-val">@aledev.web</div>
+          </div>
+        </a>
+
+        <a href="https://github.com/Alexis-Villalba" target="_blank" rel="noopener" class="contact-link reveal">
+          <div class="contact-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          </div>
+          <div>
+            <div class="contact-label">GitHub</div>
+            <div class="contact-val">Alexis-Villalba</div>
+          </div>
+        </a>
+      </div>
+
+      <form class="contact-form reveal" onsubmit="handleSubmit(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Nombre</label>
+            <input type="text" id="name" name="name" placeholder="Tu nombre" required />
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="tu@email.com" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="subject">Asunto</label>
+          <input type="text" id="subject" name="subject" placeholder="¿En qué te puedo ayudar?" />
+        </div>
+        <div class="form-group">
+          <label for="message">Mensaje</label>
+          <textarea id="message" name="message" placeholder="Contame sobre tu proyecto..." required></textarea>
+        </div>
+        <button type="submit" class="btn-send">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Enviar mensaje
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">ALE DEV</div>
+    <p class="footer-copy">© 2025 Alexis Villalba. Diseñado y desarrollado con pasión.</p>
+    <div class="footer-socials">
+      <a href="https://github.com/Alexis-Villalba" target="_blank" rel="noopener" class="social-btn" aria-label="GitHub">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+      </a>
+      <a href="https://www.instagram.com/aledev.web" target="_blank" rel="noopener" class="social-btn" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+      </a>
+      <a href="https://wa.me/543493663141" target="_blank" rel="noopener" class="social-btn" aria-label="WhatsApp">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<!-- ── SCRIPTS ────────────────────────────────────────── -->
+<script>
+/* ── Cursor ─────────────────────────────────────────────── */
+const cursor = document.getElementById('cursor');
+const ring   = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function animCursor() {
+  cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+  rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(animCursor);
+})();
+document.querySelectorAll('a, button, .skill-card, .service-card, .project-card, .testi-card, .contact-link').forEach(el => {
+  el.addEventListener('mouseenter', () => { cursor.style.transform = 'translate(-50%,-50%) scale(2)'; ring.style.transform = 'translate(-50%,-50%) scale(1.5)'; });
+  el.addEventListener('mouseleave', () => { cursor.style.transform = 'translate(-50%,-50%) scale(1)'; ring.style.transform = 'translate(-50%,-50%) scale(1)'; });
+});
+
+/* ── Three.js Hero Particles ────────────────────────────── */
+(function initHeroScene() {
+  const canvas = document.getElementById('hero-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, canvas.offsetWidth / canvas.offsetHeight, 0.1, 1000);
+  camera.position.z = 80;
+
+  // Particles
+  const COUNT = 2000;
+  const positions = new Float32Array(COUNT * 3);
+  const colors    = new Float32Array(COUNT * 3);
+  const sizes     = new Float32Array(COUNT);
+  const colorA = new THREE.Color('#5ab4d8');
+  const colorB = new THREE.Color('#3a8fb5');
+  const colorC = new THREE.Color('#7ecdef');
+
+  for (let i = 0; i < COUNT; i++) {
+    positions[i*3]   = (Math.random() - 0.5) * 200;
+    positions[i*3+1] = (Math.random() - 0.5) * 200;
+    positions[i*3+2] = (Math.random() - 0.5) * 200;
+    sizes[i] = Math.random() * 1.5 + 0.3;
+    const t = Math.random();
+    const c = t < 0.4 ? colorA : t < 0.7 ? colorB : colorC;
+    colors[i*3] = c.r; colors[i*3+1] = c.g; colors[i*3+2] = c.b;
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geo.setAttribute('color',    new THREE.BufferAttribute(colors, 3));
+  geo.setAttribute('size',     new THREE.BufferAttribute(sizes, 1));
+
+  const mat = new THREE.PointsMaterial({
+    size: 0.8, vertexColors: true,
+    transparent: true, opacity: 0.75, sizeAttenuation: true
+  });
+  const particles = new THREE.Points(geo, mat);
+  scene.add(particles);
+
+  // Floating geometric shapes
+  function makeShape(geometry, x, y, z, opacity) {
+    const mat = new THREE.MeshBasicMaterial({
+      color: 0x5ab4d8, wireframe: true, transparent: true, opacity
+    });
+    const mesh = new THREE.Mesh(geometry, mat);
+    mesh.position.set(x, y, z);
+    scene.add(mesh);
+    return mesh;
+  }
+  const shapes = [
+    makeShape(new THREE.OctahedronGeometry(8, 0),  30,  20, -30, 0.15),
+    makeShape(new THREE.IcosahedronGeometry(5, 0), -25, -15, -20, 0.12),
+    makeShape(new THREE.TetrahedronGeometry(6, 0),  15, -25, -10, 0.1),
+    makeShape(new THREE.OctahedronGeometry(4, 0),  -35,  25, -40, 0.08),
+  ];
+
+  // Mouse parallax
+  let mouseX = 0, mouseY = 0;
+  document.addEventListener('mousemove', e => {
+    mouseX = (e.clientX / window.innerWidth  - 0.5) * 2;
+    mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+  });
+
+  window.addEventListener('resize', () => {
+    const w = canvas.offsetWidth, h = canvas.offsetHeight;
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  });
+
+  let t = 0;
+  (function animate() {
+    requestAnimationFrame(animate);
+    t += 0.003;
+    particles.rotation.y = t * 0.08 + mouseX * 0.05;
+    particles.rotation.x = mouseY * 0.03;
+    shapes.forEach((s, i) => {
+      s.rotation.x += 0.003 + i * 0.001;
+      s.rotation.y += 0.005 + i * 0.001;
+      s.position.y += Math.sin(t + i * 1.5) * 0.04;
+    });
+    renderer.render(scene, camera);
+  })();
+})();
+
+/* ── Three.js About Sphere ──────────────────────────────── */
+(function initAboutScene() {
+  const canvas = document.getElementById('about-canvas');
+  if (!canvas) return;
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  const w = canvas.offsetWidth || 380;
+  renderer.setSize(w, w);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+  camera.position.z = 5;
+
+  // Wireframe sphere
+  const sphereGeo = new THREE.SphereGeometry(1.6, 24, 24);
+  const sphereMat = new THREE.MeshBasicMaterial({
+    color: 0x5ab4d8, wireframe: true, transparent: true, opacity: 0.2
+  });
+  const sphere = new THREE.Mesh(sphereGeo, sphereMat);
+  scene.add(sphere);
+
+  // Inner solid sphere
+  const innerGeo = new THREE.SphereGeometry(1.2, 32, 32);
+  const innerMat = new THREE.MeshBasicMaterial({
+    color: 0x0d1525, transparent: true, opacity: 0.95
+  });
+  scene.add(new THREE.Mesh(innerGeo, innerMat));
+
+  // Orbiting dots
+  const orbitGroup = new THREE.Group();
+  scene.add(orbitGroup);
+  for (let i = 0; i < 60; i++) {
+    const phi   = Math.acos(2 * Math.random() - 1);
+    const theta = Math.random() * Math.PI * 2;
+    const r = 1.62;
+    const dGeo = new THREE.SphereGeometry(0.025, 8, 8);
+    const dMat = new THREE.MeshBasicMaterial({ color: 0x7ecdef });
+    const dot  = new THREE.Mesh(dGeo, dMat);
+    dot.position.set(
+      r * Math.sin(phi) * Math.cos(theta),
+      r * Math.sin(phi) * Math.sin(theta),
+      r * Math.cos(phi)
+    );
+    orbitGroup.add(dot);
+  }
+
+  // Code text placeholder (torus ring)
+  const ringGeo = new THREE.TorusGeometry(1.8, 0.02, 8, 80);
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0x3a8fb5, transparent: true, opacity: 0.4 });
+  const ring1 = new THREE.Mesh(ringGeo, ringMat); ring1.rotation.x = Math.PI / 2; scene.add(ring1);
+  const ring2 = new THREE.Mesh(ringGeo, ringMat); ring2.rotation.x = Math.PI / 3; scene.add(ring2);
+
+  let at = 0;
+  (function animate() {
+    requestAnimationFrame(animate);
+    at += 0.008;
+    sphere.rotation.y = at * 0.3;
+    orbitGroup.rotation.y = at * 0.4;
+    orbitGroup.rotation.x = at * 0.15;
+    ring1.rotation.y = at * 0.2;
+    ring2.rotation.z = at * 0.1;
+    renderer.render(scene, camera);
+  })();
+})();
+
+/* ── Typing Animation ───────────────────────────────────── */
+const roles = [
+  'Desarrollador Frontend',
+  'Desarrollador Backend',
+  'Fullstack Developer',
+  'React Specialist',
+  'Diseñador Web',
+];
+let ri = 0, ci = 0, deleting = false;
+const typedEl = document.getElementById('typed-text');
+function typeLoop() {
+  const word = roles[ri];
+  if (!deleting) {
+    typedEl.textContent = word.slice(0, ci + 1);
+    ci++;
+    if (ci === word.length) { deleting = true; setTimeout(typeLoop, 1800); return; }
+  } else {
+    typedEl.textContent = word.slice(0, ci - 1);
+    ci--;
+    if (ci === 0) { deleting = false; ri = (ri + 1) % roles.length; }
+  }
+  setTimeout(typeLoop, deleting ? 55 : 90);
+}
+typeLoop();
+
+/* ── Scroll Reveal ──────────────────────────────────────── */
+const revealEls = document.querySelectorAll('.reveal');
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('active'), 80);
+      revealObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+revealEls.forEach(el => revealObs.observe(el));
+
+/* ── Skill Bars ─────────────────────────────────────────── */
+const barObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const bar = e.target.querySelector('.skill-bar');
+      if (bar) bar.style.width = bar.dataset.pct + '%';
+      barObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.skill-card').forEach(c => barObs.observe(c));
+
+/* ── Navbar scroll glass ────────────────────────────────── */
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 60) {
+    navbar.style.background = 'rgba(8,13,26,0.92)';
+    navbar.style.boxShadow = '0 4px 32px rgba(0,0,0,0.4)';
+  } else {
+    navbar.style.background = 'rgba(8,13,26,0.75)';
+    navbar.style.boxShadow = 'none';
+  }
+});
+
+/* ── Contact form ───────────────────────────────────────── */
+function handleSubmit(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('.btn-send');
+  btn.textContent = '¡Mensaje enviado!';
+  btn.style.background = '#22c55e';
+  setTimeout(() => {
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviar mensaje';
+    btn.style.background = '';
+    e.target.reset();
+  }, 3000);
+  const wa = `https://wa.me/543493663141?text=${encodeURIComponent('Hola Alexis! Te escribo desde tu portfolio.')}`;
+  window.open(wa, '_blank');
+}
+
+/* ── Smooth active nav link ─────────────────────────────── */
+const sections = document.querySelectorAll('section[id]');
+const navLinks  = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', () => {
+  let cur = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) cur = s.id; });
+  navLinks.forEach(a => {
+    a.style.color = a.getAttribute('href') === '#' + cur ? 'var(--accent)' : '';
+  });
+});
+</script>
+
+</body>
+</html>
