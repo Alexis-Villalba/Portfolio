@@ -214,16 +214,37 @@
     }
 
     .hero-scroll {
-      position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      position: absolute; bottom: 2rem; left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
       display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
       color: var(--muted); font-size: 0.72rem; letter-spacing: 0.1em;
-      z-index: 2;
-      animation: float 3s ease-in-out infinite;
     }
-    @keyframes float { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(-6px)} }
+    .hero-scroll-inner {
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    }
     .scroll-line {
       width: 1px; height: 40px;
-      background: linear-gradient(to bottom, var(--accent), transparent);
+      position: relative; overflow: hidden;
+      background: rgba(90,180,216,0.15);
+    }
+    .scroll-line::after {
+      content: '';
+      position: absolute; top: -100%; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(to bottom, transparent, var(--accent), transparent);
+      animation: scrollDrop 2s ease-in-out infinite;
+    }
+    @keyframes scrollDrop {
+      0%   { top: -100%; opacity: 1; }
+      100% { top: 100%;  opacity: 0.2; }
+    }
+    .scroll-label {
+      animation: fadePulse 2s ease-in-out infinite;
+    }
+    @keyframes fadePulse {
+      0%,100% { opacity: 0.4; }
+      50%     { opacity: 0.9; }
     }
 
     /* ── SECTIONS ──────────────────────────────────── */
@@ -700,8 +721,9 @@
     </div>
   </div>
   <div class="hero-scroll">
-    <div class="scroll-line"></div>
-    SCROLL
+    <div class="hero-scroll-inner">
+      <div class="scroll-line"></div>
+    </div>
   </div>
 </section>
 
