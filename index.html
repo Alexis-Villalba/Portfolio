@@ -350,22 +350,17 @@
     }
     .skill-icon svg { width: 26px; height: 26px; }
     .skill-name { font-weight: 600; font-size: 0.95rem; }
-    .skill-bar-wrap {
-      width: 100%;
-      background: rgba(255,255,255,0.05);
-      border-radius: 4px;
-      height: 4px;
-      overflow: hidden;
+    .skill-cat {
+      font-size: 0.72rem; font-weight: 600;
+      color: var(--accent2);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.65rem;
+      background: rgba(90,180,216,0.08);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      align-self: flex-start;
     }
-    .skill-bar {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent2), var(--accent3));
-      border-radius: 4px;
-      width: 0%;
-      transition: width 1.4s cubic-bezier(.25,.46,.45,.94);
-    }
-    .skill-pct { font-size: 0.78rem; color: var(--muted); margin-left: auto; }
-    .skill-meta { display: flex; width: 100%; align-items: center; }
 
     /* ── SERVICES ──────────────────────────────────── */
     .services-grid {
@@ -410,8 +405,42 @@
     .service-card h3 { font-weight: 700; font-size: 1.1rem; margin-bottom: 0.6rem; }
     .service-card p { color: var(--muted); font-size: 0.88rem; line-height: 1.65; }
 
-    /* ── EDUCATION ─────────────────────────────────── */
-    #education { background: var(--surface); }
+    #process { background: var(--surface); }
+    .process-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1.5rem;
+    }
+    .process-step {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2rem 1.75rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s, border-color 0.25s;
+    }
+    .process-step:hover { transform: translateY(-5px); border-color: var(--accent); }
+    .process-num {
+      font-family: 'Archivo', sans-serif;
+      font-size: 3.5rem; font-weight: 900;
+      color: rgba(90,180,216,0.07);
+      line-height: 1;
+      position: absolute; top: 1rem; right: 1.5rem;
+    }
+    .process-icon {
+      width: 52px; height: 52px;
+      background: rgba(90,180,216,0.1);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.25rem;
+      color: var(--accent);
+    }
+    .process-icon svg { width: 26px; height: 26px; }
+    .process-step h3 { font-weight: 700; font-size: 1.05rem; margin-bottom: 0.6rem; }
+    .process-step p { color: var(--muted); font-size: 0.87rem; line-height: 1.65; }
+
+    #education { background: var(--bg); }
     .edu-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -677,24 +706,22 @@
 </head>
 <body>
 
-<!-- Custom Cursor -->
 <div id="cursor"></div>
 <div id="cursor-ring"></div>
 
-<!-- ── NAV ───────────────────────────────────────────── -->
 <nav id="navbar">
   <a href="#hero" class="nav-logo">ALE DEV</a>
   <ul class="nav-links">
     <li><a href="#about">Sobre mí</a></li>
     <li><a href="#skills">Skills</a></li>
     <li><a href="#services">Servicios</a></li>
+    <li><a href="#process">Proceso</a></li>
     <li><a href="#education">Formación</a></li>
     <li><a href="#projects">Proyectos</a></li>
     <li><a href="#contact" class="nav-cta">Contacto</a></li>
   </ul>
 </nav>
 
-<!-- ── HERO ──────────────────────────────────────────── -->
 <section id="hero">
   <canvas id="hero-canvas"></canvas>
   <div class="hero-content">
@@ -727,7 +754,6 @@
   </div>
 </section>
 
-<!-- ── ABOUT ──────────────────────────────────────────── -->
 <section id="about">
   <div class="container">
     <div class="about-grid">
@@ -760,7 +786,6 @@
   </div>
 </section>
 
-<!-- ── SKILLS ─────────────────────────────────────────── -->
 <section id="skills">
   <div class="container">
     <p class="section-tag reveal">Habilidades técnicas</p>
@@ -768,7 +793,6 @@
     <p class="section-sub reveal">Herramientas y tecnologías que domino para construir productos web modernos de principio a fin.</p>
 
     <div class="skills-grid">
-      <!-- HTML -->
       <div class="skill-card reveal">
         <div class="skill-icon">
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#5ab4d8">
@@ -777,12 +801,8 @@
           </svg>
         </div>
         <div class="skill-name">HTML5</div>
-        <div class="skill-meta">
-          <div class="skill-bar-wrap" style="flex:1"><div class="skill-bar" data-pct="95"></div></div>
-          <span class="skill-pct" style="margin-left:0.75rem">95%</span>
-        </div>
+        <div class="skill-cat">Frontend</div>
       </div>
-      <!-- CSS -->
       <div class="skill-card reveal">
         <div class="skill-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="#5ab4d8" xmlns="http://www.w3.org/2000/svg">
@@ -791,12 +811,8 @@
           </svg>
         </div>
         <div class="skill-name">CSS3</div>
-        <div class="skill-meta">
-          <div class="skill-bar-wrap" style="flex:1"><div class="skill-bar" data-pct="90"></div></div>
-          <span class="skill-pct" style="margin-left:0.75rem">90%</span>
-        </div>
+        <div class="skill-cat">Frontend</div>
       </div>
-      <!-- JS -->
       <div class="skill-card reveal">
         <div class="skill-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="#5ab4d8" xmlns="http://www.w3.org/2000/svg">
@@ -805,12 +821,8 @@
           </svg>
         </div>
         <div class="skill-name">JavaScript</div>
-        <div class="skill-meta">
-          <div class="skill-bar-wrap" style="flex:1"><div class="skill-bar" data-pct="88"></div></div>
-          <span class="skill-pct" style="margin-left:0.75rem">88%</span>
-        </div>
+        <div class="skill-cat">Lenguaje</div>
       </div>
-      <!-- React -->
       <div class="skill-card reveal">
         <div class="skill-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="#5ab4d8" xmlns="http://www.w3.org/2000/svg">
@@ -821,12 +833,8 @@
           </svg>
         </div>
         <div class="skill-name">React JS</div>
-        <div class="skill-meta">
-          <div class="skill-bar-wrap" style="flex:1"><div class="skill-bar" data-pct="82"></div></div>
-          <span class="skill-pct" style="margin-left:0.75rem">82%</span>
-        </div>
+        <div class="skill-cat">Frontend</div>
       </div>
-      <!-- Node.js -->
       <div class="skill-card reveal">
         <div class="skill-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="#5ab4d8" xmlns="http://www.w3.org/2000/svg">
@@ -835,12 +843,8 @@
           </svg>
         </div>
         <div class="skill-name">Node.js & Express</div>
-        <div class="skill-meta">
-          <div class="skill-bar-wrap" style="flex:1"><div class="skill-bar" data-pct="78"></div></div>
-          <span class="skill-pct" style="margin-left:0.75rem">78%</span>
-        </div>
+        <div class="skill-cat">Backend</div>
       </div>
-      <!-- Git -->
       <div class="skill-card reveal">
         <div class="skill-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="#5ab4d8" xmlns="http://www.w3.org/2000/svg">
@@ -852,12 +856,8 @@
           </svg>
         </div>
         <div class="skill-name">Git & GitHub</div>
-        <div class="skill-meta">
-          <div class="skill-bar-wrap" style="flex:1"><div class="skill-bar" data-pct="85"></div></div>
-          <span class="skill-pct" style="margin-left:0.75rem">85%</span>
-        </div>
+        <div class="skill-cat">Control de versiones</div>
       </div>
-      <!-- DB -->
       <div class="skill-card reveal">
         <div class="skill-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="#5ab4d8" xmlns="http://www.w3.org/2000/svg">
@@ -868,12 +868,8 @@
           </svg>
         </div>
         <div class="skill-name">Bases de datos</div>
-        <div class="skill-meta">
-          <div class="skill-bar-wrap" style="flex:1"><div class="skill-bar" data-pct="72"></div></div>
-          <span class="skill-pct" style="margin-left:0.75rem">72%</span>
-        </div>
+        <div class="skill-cat">Backend</div>
       </div>
-      <!-- Office -->
       <div class="skill-card reveal">
         <div class="skill-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="#5ab4d8" xmlns="http://www.w3.org/2000/svg">
@@ -884,16 +880,12 @@
           </svg>
         </div>
         <div class="skill-name">Microsoft Office</div>
-        <div class="skill-meta">
-          <div class="skill-bar-wrap" style="flex:1"><div class="skill-bar" data-pct="93"></div></div>
-          <span class="skill-pct" style="margin-left:0.75rem">93%</span>
-        </div>
+        <div class="skill-cat">Herramientas</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── SERVICES ───────────────────────────────────────── -->
 <section id="services">
   <div class="container">
     <p class="section-tag reveal">Lo que ofrezco</p>
@@ -959,7 +951,48 @@
   </div>
 </section>
 
-<!-- ── EDUCATION ──────────────────────────────────────── -->
+<section id="process">
+  <div class="container">
+    <p class="section-tag reveal">Cómo trabajo</p>
+    <h2 class="section-title reveal">Mi proceso de trabajo.</h2>
+    <p class="section-sub reveal">Un flujo claro y transparente de principio a fin para que tu proyecto sea un éxito.</p>
+    <div class="process-grid">
+      <div class="process-step reveal">
+        <div class="process-num">01</div>
+        <div class="process-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <h3>Descubrimiento</h3>
+        <p>Entiendo tu negocio, tus objetivos y a tu público. Analizo la competencia y defino la mejor estrategia digital para tu proyecto.</p>
+      </div>
+      <div class="process-step reveal">
+        <div class="process-num">02</div>
+        <div class="process-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h4"/><circle cx="16" cy="15" r="2"/><path d="M18 17l2 2"/></svg>
+        </div>
+        <h3>Diseño y maqueta</h3>
+        <p>Creo el diseño visual y la maqueta de tu sitio. Validamos juntos cada pantalla antes de escribir una sola línea de código.</p>
+      </div>
+      <div class="process-step reveal">
+        <div class="process-num">03</div>
+        <div class="process-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <h3>Desarrollo</h3>
+        <p>Construyo el sitio con tecnologías modernas, código limpio y optimizado. Responsive, rápido y listo para escalar.</p>
+      </div>
+      <div class="process-step reveal">
+        <div class="process-num">04</div>
+        <div class="process-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+        </div>
+        <h3>Lanzamiento</h3>
+        <p>Publicamos, configuramos el dominio y afinamos los detalles. Acompañamiento post-lanzamiento para que todo funcione perfecto.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="education">
   <div class="container">
     <p class="section-tag reveal">Mi camino</p>
@@ -1039,7 +1072,6 @@
   </div>
 </section>
 
-<!-- ── PROJECTS ───────────────────────────────────────── -->
 <section id="projects">
   <div class="container">
     <p class="section-tag reveal">Portfolio</p>
@@ -1047,48 +1079,6 @@
     <p class="section-sub reveal">Una selección de los proyectos que desarrollé durante mi formación y práctica profesional.</p>
 
     <div class="projects-grid">
-
-      <div class="project-card reveal">
-        <div class="project-thumb">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </div>
-        <div class="project-body">
-          <div class="project-tags">
-            <span class="project-tag">Node.js</span>
-            <span class="project-tag">Express</span>
-            <span class="project-tag">MongoDB</span>
-          </div>
-          <h3>Programación Backend</h3>
-          <p>Proyecto de backend completo desarrollado con Node.js, Express y bases de datos. API REST con autenticación y gestión de datos.</p>
-          <div class="project-links">
-            <a href="https://github.com/Alexis-Villalba" target="_blank" rel="noopener" class="proj-link">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-              GitHub
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <div class="project-card reveal">
-        <div class="project-thumb" style="background: linear-gradient(135deg, #0f2027 0%, #1a3a5c 100%);">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/></svg>
-        </div>
-        <div class="project-body">
-          <div class="project-tags">
-            <span class="project-tag">React JS</span>
-            <span class="project-tag">JavaScript</span>
-            <span class="project-tag">CSS</span>
-          </div>
-          <h3>Proyecto ReactJS</h3>
-          <p>Aplicación web desarrollada con React JS aplicando componentes, hooks, estado y routing. Proyecto certificado en Coderhouse.</p>
-          <div class="project-links">
-            <a href="https://github.com/Alexis-Villalba" target="_blank" rel="noopener" class="proj-link">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-              GitHub
-            </a>
-          </div>
-        </div>
-      </div>
 
       <div class="project-card reveal">
         <div class="project-thumb" style="background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 100%);">
@@ -1136,7 +1126,6 @@
   </div>
 </section>
 
-<!-- ── TESTIMONIALS ───────────────────────────────────── -->
 <section id="testimonials">
   <div class="container">
     <p class="section-tag reveal">Lo que dicen</p>
@@ -1189,7 +1178,6 @@
   </div>
 </section>
 
-<!-- ── CONTACT ────────────────────────────────────────── -->
 <section id="contact">
   <div class="container">
     <p class="section-tag reveal">Contacto</p>
@@ -1267,7 +1255,6 @@
   </div>
 </section>
 
-<!-- ── FOOTER ─────────────────────────────────────────── -->
 <footer>
   <div class="footer-inner">
     <div class="footer-logo">ALE DEV</div>
@@ -1286,7 +1273,6 @@
   </div>
 </footer>
 
-<!-- ── SCRIPTS ────────────────────────────────────────── -->
 <script>
 /* ── Cursor ─────────────────────────────────────────────── */
 const cursor = document.getElementById('cursor');
@@ -1491,18 +1477,6 @@ const revealObs = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.1 });
 revealEls.forEach(el => revealObs.observe(el));
-
-/* ── Skill Bars ─────────────────────────────────────────── */
-const barObs = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      const bar = e.target.querySelector('.skill-bar');
-      if (bar) bar.style.width = bar.dataset.pct + '%';
-      barObs.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.3 });
-document.querySelectorAll('.skill-card').forEach(c => barObs.observe(c));
 
 /* ── Navbar scroll glass ────────────────────────────────── */
 const navbar = document.getElementById('navbar');
